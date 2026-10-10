@@ -1,0 +1,18 @@
+[Unit]
+Description=GameDesk API
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/srv/gamedesk
+EnvironmentFile=/etc/gamedesk.env
+ExecStart=/usr/bin/node server/index.js
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/gamedesk
+
+[Install]
+WantedBy=multi-user.target
