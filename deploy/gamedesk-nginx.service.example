@@ -1,0 +1,16 @@
+[Unit]
+Description=GameDesk dedicated Nginx
+After=network.target gamedesk.service
+Requires=gamedesk.service
+
+[Service]
+Type=forking
+PIDFile=/run/gamedesk-nginx.pid
+ExecStartPre=/usr/sbin/nginx -t -c /etc/gamedesk/nginx.conf
+ExecStart=/usr/sbin/nginx -c /etc/gamedesk/nginx.conf
+ExecReload=/usr/sbin/nginx -s reload -c /etc/gamedesk/nginx.conf
+ExecStop=/usr/sbin/nginx -s quit -c /etc/gamedesk/nginx.conf
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

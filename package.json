@@ -1,20 +1,28 @@
 {
-  "name": "games-rating-admin",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "gamedesk",
+  "private": true,
+  "version": "2.0.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "dev": "concurrently \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "node --watch server/index.js",
+    "dev:client": "vite --host 0.0.0.0",
+    "start": "node server/index.js",
+    "build": "vite build",
+    "test": "node --test server/tests/*.test.js && vitest run"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.20.2",
-    "express": "^4.19.2"
+    "better-sqlite3": "^11.10.0",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "vue": "^3.5.18",
+    "vue-router": "^4.5.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
-  },
-  "description": ""
+    "@vitejs/plugin-vue": "^5.2.4",
+    "concurrently": "^9.2.1",
+    "sass": "^1.89.0",
+    "supertest": "^7.1.1",
+    "vite": "^6.3.5",
+    "vitest": "^4.1.11"
+  }
 }
