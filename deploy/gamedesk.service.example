@@ -4,7 +4,8 @@ After=network.target
 
 [Service]
 Type=simple
-User=www-data
+User=gamedesk
+Group=gamedesk
 WorkingDirectory=/srv/gamedesk
 EnvironmentFile=/etc/gamedesk.env
 ExecStart=/usr/bin/node server/index.js

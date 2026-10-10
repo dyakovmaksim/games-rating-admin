@@ -3,20 +3,27 @@ const { seedGames } = require("../database/seed");
 function sessionMiddleware(db, games) {
   const days = Math.max(1, Number(process.env.SESSION_DAYS || 7));
   const duration = days * 86400000;
-  const insertSeed = db.transaction((id) =>
+  let lastCleanup = 0;
+  const createSession = db.transaction((id, now) => {
+    db.prepare("INSERT INTO sessions (id, expires_at) VALUES (?, ?)").run(
+      id,
+      now + duration,
+    );
     seedGames.forEach((game, index) =>
       games.create(
         id,
         game,
-        new Date(Date.now() - (seedGames.length - index) * 60000).toISOString(),
+        new Date(now - (seedGames.length - index) * 60000).toISOString(),
       ),
-    ),
-  );
+    );
+  });
   return function session(req, res, next) {
     try {
       const now = Date.now();
-      if (Math.random() < 0.01)
+      if (now - lastCleanup > 3600000) {
         db.prepare("DELETE FROM sessions WHERE expires_at < ?").run(now);
+        lastCleanup = now;
+      }
       const cookie = req.headers.cookie
         ?.split(";")
         .map((part) => part.trim())
@@ -29,11 +36,7 @@ function sessionMiddleware(db, games) {
           .get(cookie, now);
       const id = existing ? cookie : randomBytes(32).toString("hex");
       if (!existing) {
-        db.prepare("INSERT INTO sessions (id, expires_at) VALUES (?, ?)").run(
-          id,
-          now + duration,
-        );
-        insertSeed(id);
+        createSession(id, now);
       } else
         db.prepare("UPDATE sessions SET expires_at = ? WHERE id = ?").run(
           now + duration,
