@@ -52,7 +52,14 @@ async function load() {
   error.value = "";
   try {
     const data = await api.list(params.value, current.signal);
-    if (controller === current) result.value = data;
+    if (controller !== current) return;
+    if (data.pagination.total && data.pagination.page > data.pagination.pages) {
+      await router.replace({
+        query: { ...route.query, page: String(data.pagination.pages) },
+      });
+      return;
+    }
+    result.value = data;
   } catch (e) {
     if (e.name !== "AbortError" && controller === current)
       error.value = e.message;
